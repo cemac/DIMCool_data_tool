@@ -28,11 +28,11 @@ Arguments:
     proc  : Number of parallel processes (maximum 40). Default is 1
 
 Restrictions:
-    There should be a set of 120 folders with years from 1980 to 2099 in execution folder
+    There should be a set of at least 101 folders with years from 1990 to 2090 in execution folder
     Assumption that folder structure is country/crop/model/rcp/years, and that filenaming
     convention is:
 
-        <crop>_<country>_amma_<model>_<rcp>_Fut_<year>_<prod>_<irr>_1.out
+        <crop>_<country>_amma_df_<model>_<rcp>_Fut_<year>_<prod>_<irr>_1.out
 
     This filenaming convention can be changed on lines 446-447
 
@@ -58,14 +58,14 @@ countries={
         "zambia":3
         }
 crops={
-      "cassava":0,
+      "potato":0,
       "groundnut":1,
       "maize":2,
-      "millet":3,
-      "potato":4,
+      "soybean":3,
+      "cassava":4,
       "rice":5,
       "sorghum":6,
-      "soybean":7,
+      "millet":7,
       "sugarcane":8,
       "sweetpot":9,
       "wheat":10
@@ -332,10 +332,10 @@ def readargs():
 
     contents=[i for i in os.listdir(ascdir) if os.path.isdir(os.path.join(ascdir,i))]
 
-    years = [str(i) for i in range(1980,2100)]
+    years = [str(i) for i in range(1990,2091)]
     if not all(x in contents for x in years):
         raise errlib.ArgumentsError('Data file directory expected to contain 120 numbered folders\n'+
-                             'numbered from 1980 to 2099 inclusive, but these folders were\n'+
+                             'numbered from 1990 to 2090 inclusive, but these folders were\n'+
                              'not found. Check that the directory argument is correct.\n'+
                              'Directory checked was '+ascdir+'\n')
 
@@ -369,7 +369,7 @@ def getyrs(locdir):
 
     yrs=[]
     for fol in os.walk(locdir):
-        if len(fol[2]) >= 120:
+        if len(fol[2]) >= 100:
             yr=fol[0].split('/')[-1]
             if not yr=='':
                 yrs.append(yr)
@@ -449,7 +449,7 @@ def fullyr(data):
     for prod in prod_lst:
         for irr in irr_lst:
             n+=1
-            filenm=valnames[1]+"_"+valnames[0]+"_amma_"+valnames[2]+"_"
+            filenm=valnames[1]+"_"+valnames[0]+"_amma_df_"+valnames[2]+"_"
             filenm=filenm+valnames[3]+"_Fut_"+yr+"_"+prod+"_"+irr+"_1.out"
             path=ascdir+yr+"/"+filenm
 

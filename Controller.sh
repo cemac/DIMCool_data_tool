@@ -13,10 +13,10 @@ JOB_OUT='/nobackup/chmcsy/job_out_consolidate'
 JOB_DONE='/nobackup/chmcsy/consolidate_completed'
 
 # conda install location
-CONDA_LOC='/nobackup/chmcsy/miniconda3'
+CONDA_LOC='/nobackup/chmcsy/miniconda'
 
 # python script location
-PYLOC='~/iFEED_Prototype/DIMCool_data_tool'
+PYLOC='~/DIMCool_data_tool'
 
 RUN_DIR=$PWD
 
@@ -25,17 +25,18 @@ N_PROC='8'
 
 mkdir -p $JOB_DONE
 mkdir -p $JOB_OUT
+mkdir -p $NC_DIR
 
 # going to loop over these in turn, and submit a job for each cobination:
 #CROPS="maize soybean potato groundnut"
 #REGIONS="malawi zambia tanzania safrica"
 #MODELS="bcc-csm1-1 BNU-ESM CSIRO-Mk3-6-0 GFDL-ESM2G IPSL-CM5A-LR MIROC-ESM MPI-ESM-LR MRI-CGCM3 NorESM1-M bcc-csm1-1-m CanESM2 CNRM-CM5 GFDL-CM3 GFDL-ESM2M IPSL-CM5A-MR MIROC5 MIROC-ESM-CHEM MPI-ESM-MR"
-#RCPS="rcp26 rcp85"
+RCPS="rcp26 rcp85"
 
 CROPS="groundnut"
 REGIONS="malawi"
 MODELS="bcc-csm1-1"
-RCPS="rcp26"
+#RCPS="rcp26"
 
 # prefix for job script:
 JOB_PREFIX='consolidate'
