@@ -13,10 +13,10 @@ JOB_OUT='/nobackup/chmcsy/job_out_consolidate'
 JOB_DONE='/nobackup/chmcsy/consolidate_completed'
 
 # conda install location
-CONDA_LOC='/nobackup/chmcsy/miniconda3'
+CONDA_LOC='/nobackup/chmcsy/miniconda'
 
 # python script location
-PYLOC='~/iFEED_Prototype/DIMCool_data_tool'
+PYLOC='~/DIMCool_data_tool'
 
 RUN_DIR=$PWD
 
@@ -25,6 +25,7 @@ N_PROC='8'
 
 mkdir -p $JOB_DONE
 mkdir -p $JOB_OUT
+mkdir -p $NC_DIR
 
 # going to loop over these in turn, and submit a job for each cobination:
 #CROPS="maize soybean potato groundnut"
