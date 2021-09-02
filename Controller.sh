@@ -31,12 +31,12 @@ mkdir -p $NC_DIR
 #CROPS="maize soybean potato groundnut"
 #REGIONS="malawi zambia tanzania safrica"
 #MODELS="bcc-csm1-1 BNU-ESM CSIRO-Mk3-6-0 GFDL-ESM2G IPSL-CM5A-LR MIROC-ESM MPI-ESM-LR MRI-CGCM3 NorESM1-M bcc-csm1-1-m CanESM2 CNRM-CM5 GFDL-CM3 GFDL-ESM2M IPSL-CM5A-MR MIROC5 MIROC-ESM-CHEM MPI-ESM-MR"
-#RCPS="rcp26 rcp85"
+RCPS="rcp26 rcp85"
 
 CROPS="groundnut"
 REGIONS="malawi"
 MODELS="bcc-csm1-1"
-RCPS="rcp26"
+#RCPS="rcp26"
 
 # prefix for job script:
 JOB_PREFIX='consolidate'
