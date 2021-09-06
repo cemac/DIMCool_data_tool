@@ -67,7 +67,7 @@ def dirverify(iopath, inout="input"):
             return False
 
     if iopath and not path.isdir(iopath):
-        	print('Data '+inout+' location is not a directory\n')
-            return False
+        print('Data '+inout+' location is not a directory\n')
+        return False
 
     return True
