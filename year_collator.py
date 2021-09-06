@@ -32,7 +32,7 @@ Restrictions:
     Assumption that folder structure is country/crop/model/rcp/years, and that filenaming
     convention is:
 
-        <crop>_<country>_amma_df_<model>_<rcp>_Fut_<year>_<prod>_<irr>_1.out
+        <crop>_<country>_<filestring>_<model>_<rcp>_Fut_<year>_<prod>_<irr>_1.out
 
     This filenaming convention can be changed on lines 446-447
 
@@ -48,206 +48,9 @@ import os
 import argparse
 import time
 from multiprocessing import Pool
-import errlib
+from errlib import ArgumentsError, FileError
+from glamdict import *
 from nco import Nco
-
-countries={
-        "malawi":0,
-        "safrica":1,
-        "tanzania":2,
-        "zambia":3
-        }
-crops={
-      "potato":0,
-      "groundnut":1,
-      "maize":2,
-      "soybean":3,
-      "cassava":4,
-      "rice":5,
-      "sorghum":6,
-      "millet":7,
-      "sugarcane":8,
-      "sweetpot":9,
-      "wheat":10
-      }
-models={
-       "bcc-csm1-1":0,
-       "bcc-csm1-1-m":1,
-       "BNU-ESM":2,
-       "CanESM2":3,
-       "CNRM-CM5":4,
-       "CSIRO-Mk3-6-0":5,
-       "GFDL-CM3":6,
-       "GFDL-ESM2G":7,
-       "GFDL-ESM2M":8,
-       "IPSL-CM5A-LR":9,
-       "IPSL-CM5A-MR":10,
-       "MIROC5":11,
-       "MIROC-ESM":12,
-       "MIROC-ESM-CHEM":13,
-       "MPI-ESM-LR":14,
-       "MPI-ESM-MR":15,
-       "MRI-CGCM3":16,
-       "NorESM1-M":17
-       }
-rcps={
-     "rcp26":0,
-     "rcp85":2
-     }
-
-prod_lst=["0.1","0.2","0.3","0.4","0.5","0.6","0.7","0.8","0.9","1"]
-irr_lst=["0","0.1","0.2","0.3","0.4","0.5","0.6","0.7","0.8","0.9","1","2"]
-
-column={'V1': 'Year',
-        'V2': 'Latitude',
-        'V3': 'Longitude',
-        'V4': 'Planting date',
-        'V5': 'Final crop stage (ISTG)',
-        'V6': 'Mean root length density by volume',
-        'V7': 'LAI (specifically RLAI (2))',
-        'V8': 'Yield',
-        'V9': 'Biomass',
-        'V10': 'Empty (irrigated fraction; SLA)',
-        'V11': 'Harvest index',
-        'V12': 'Cumulative rain',
-        'V13': 'Solar radiation',
-        'V14': 'Total soil water',
-        'V15': 'Transpiration',
-        'V16': 'Evapotranspiration_1',
-        'V17': 'Potential evapotranspiration (limited by soil transport, LAI and energy)',
-        'V18': 'Soil water stress factor',
-        'V19': 'Evapotranspiration_2',
-        'V20': 'Runoff',
-        'V21': 'Cumulative runoff',
-        'V22': 'Potential (root-limited) uptake',
-        'V23': 'Cumulative potential uptake',
-        'V24': 'Drainage',
-        'V25': 'Cumulative drainage',
-        'V26': 'Potential (energy-limited) transpiration',
-        'V27': 'Cumulative potential transpiration',
-        'V28': 'Cumulative evaporation',
-        'V29': 'Max LAI during growing season',
-        'V30': 'Cumulative potential evaporation',
-        'V31': 'Cumulative transpiration',
-        'V32': 'Root length density by area',
-        'V33': 'Root Length Density by Area / LAI',
-        'V34': 'Rainfall',
-        'V35': 'Change in soil moisture',
-        'V36': 'Absorbed radiation',
-        'V37': 'Duration',
-        'V38': 'Mean vapour pressure deficit',
-        'V39': 'Tot net radiation',
-        'V40': 'Total percentage of pods setting (TOTPP)',
-        'V41': 'Total percentage of pods setting considering temperature only (TOTPP_HIT)',
-        'V42': 'Total percentage of pods setting considering water stress only (TOTPP_WAT)',
-        'V43': 'Mean temperature during the crop season (planting to harvest).',
-        'V44': 'Factor DHDT is reduced by due to heat stress when HTS=1 or 2 (HT_FAC)',
-        'V45': 'TOTWHARVDEP',
-        'V46': 'STORED_WATER',
-        'V47': 'Panicle initiation date (DOY - Sorghum only)',
-        'V48': 'Flowering date (DOY - Sorghum only)',
-        'V49': 'Total supplementary irrigation added to VOLSW (1) if using SUP irrigation'
-        }
-var_nm={'V1' : 'year',
-        'V2' : 'latitude',
-        'V3' : 'longitude',
-        'V4' : 'plant_date',
-        'V5' : 'istg_final',
-        'V6' : 'rlv_mean',
-        'V7' : 'rlai_2',
-        'V8' : 'yield',
-        'V9' : 'biomass',
-        'V10': 'sla',
-        'V11': 'harv_index',
-        'V12': 'tot_rain',
-        'V13': 'srad_final',
-        'V14': 'soil_wat',
-        'V15': 'trans',
-        'V16': 'evtrans1',
-        'V17': 'pot_evtrans',
-        'V18': 'soil_wat_fac',
-        'V19': 'evtrans2',
-        'V20': 'runoff',
-        'V21': 'tot_runoff',
-        'V22': 'pot_uptake',
-        'V23': 'tot_pot_uptake',
-        'V24': 'drainage',
-        'V25': 'tot_drainage',
-        'V26': 'pot_trans',
-        'V27': 'tot_pot_trans',
-        'V28': 'tot_evap',
-        'V29': 'lai_max',
-        'V30': 'tot_pot_ev',
-        'V31': 'tot_trans',
-        'V32': 'rla',
-        'V33': 'rla_over_lai',
-        'V34': 'rain_final',
-        'V35': 'd_soil_moist',
-        'V36': 't_rad_abs',
-        'V37': 'dur',
-        'V38': 'mean_vap_pres_def',
-        'V39': 'Tot_net_rad',
-        'V40': 'tot_per_pod',
-        'V41': 'tot_per_pod_hit',
-        'V42': 'tot_per_pod_wat',
-        'V43': 'mean_temp',
-        'V44': 'dhdt_fac',
-        'V45': 'totwharvdep',
-        'V46': 'stor_wat',
-        'V47': 'pan_init_date',
-        'V48': 'flowr_date',
-        'V49': 'tot_irr_sup'
-        }
-var_units={'V1' : 'year',
-           'V2' : 'degrees_north',
-           'V3' : 'degrees_east',
-           'V4' : 'days',
-           'V5' : '1',
-           'V6' : 'cm/cm^3',
-           'V7' : 'm^2/m^2',
-           'V8' : 'kg/ha',
-           'V9' : 'kg/ha',
-           'V10': '1',
-           'V11': '1',
-           'V12': 'cm',
-           'V13': 'MJ/m^2',
-           'V14': 'cm',
-           'V15': 'cm',
-           'V16': 'cm',
-           'V17': 'cm',
-           'V18': '1',
-           'V19': 'cm',
-           'V20': 'cm',
-           'V21': 'cm',
-           'V22': 'cm',
-           'V23': 'cm',
-           'V24': 'cm',
-           'V25': 'cm',
-           'V26': 'cm',
-           'V27': 'cm',
-           'V28': 'cm',
-           'V29': 'm^2/m^2',
-           'V30': 'cm',
-           'V31': 'cm',
-           'V32': 'cm/cm^2',
-           'V33': 'cm/cm^2',
-           'V34': 'cm',
-           'V35': 'cm',
-           'V36': 'MJ/m^2',
-           'V37': 'days',
-           'V38': 'kPa',
-           'V39': 'MJ/m^2',
-           'V40': '%',
-           'V41': '%',
-           'V42': '%',
-           'V43': 'celsius',
-           'V44': '1',
-           'V45': 'cm',
-           'V46': 'cm',
-           'V47': 'day',
-           'V48': 'day',
-           'V49': 'cm'
-           }
 
 nco=Nco()
 
@@ -299,6 +102,11 @@ def readargs():
                         help='Directory for output file',
                         default='.')
 
+    parser.add_argument('--string', '-s',
+                        type=str,
+                        help='String used in ascii filenames',
+                        default='amma')
+
     parser.add_argument('--proc', '-p',
                         type=int,
                         help='Number of parallel processes used for data reading and combination',
@@ -307,13 +115,13 @@ def readargs():
     args = parser.parse_args()
 
     if not isinstance(args.dir,str):
-        raise errlib.ArgumentsError("Data running directory is not a string!\n")
+        raise ArgumentsError("Data running directory is not a string!\n")
 
     if not isinstance(args.out,str):
-        raise errlib.ArgumentsError("Output filename is not a string!\n")
+        raise ArgumentsError("Output filename is not a string!\n")
 
     if not isinstance(args.proc,int):
-        raise errlib.ArgumentsError("Number of parallel processes is not an integer!\n")
+        raise ArgumentsError("Number of parallel processes is not an integer!\n")
 
     if args.dir=='.':
         ascdir=os.getcwd()
@@ -327,43 +135,44 @@ def readargs():
         ascdir=ascdir+"/"
 
     if not os.path.exists(ascdir):
-        raise errlib.ArgumentsError('Path to data files does not exist: '
+        raise ArgumentsError('Path to data files does not exist: '
                              + ascdir+'\n')
 
     contents=[i for i in os.listdir(ascdir) if os.path.isdir(os.path.join(ascdir,i))]
 
     years = [str(i) for i in range(1990,2091)]
     if not all(x in contents for x in years):
-        raise errlib.ArgumentsError('Data file directory expected to contain 120 numbered folders\n'+
+        raise ArgumentsError('Data file directory expected to contain at least 101 numbered folders\n'+
                              'numbered from 1990 to 2090 inclusive, but these folders were\n'+
                              'not found. Check that the directory argument is correct.\n'+
                              'Directory checked was '+ascdir+'\n')
 
     if not os.path.exists(args.out):
-        raise errlib.ArgumentsError('Directory to write netCDF file to'
+        raise ArgumentsError('Directory to write netCDF file to'
                                     + ' does not exist\n')
 
     if args.out and not os.path.isdir(args.out):
-        raise errlib.ArgumentsError('Directory to write netCDF file to'
+        raise ArgumentsError('Directory to write netCDF file to'
                                     + ' does not exist\n')
 
     try:
-        os.makedirs(os.path.join(args.out,"ind_rcp",simval[0]))
+        os.makedirs(os.path.join(args.out,simval[0],"ind_rcp"))
     except FileExistsError:
         # directory already exists
         pass
 
-    outfil=os.path.join(args.out,"ind_rcp",simval[0],"_".join(simval[1:]))
+    outfil=os.path.join(args.out,simval[0],"ind_rcp","_".join(simval[1:]))
 
     if args.proc > 40:
-        raise errlib.ArgumentsError("Too many processes requested. Maximum of 40\n")
+        raise ArgumentsError("Too many processes requested. Maximum of 40\n")
 
     procs=args.proc
 
-    retdata=[ascdir,simval,procs,outfil]
+    filestring=args.string
+
+    retdata=[ascdir,simval,procs,outfil,filestring]
 
     return retdata
-
 
 def getyrs(locdir):
 
@@ -382,7 +191,7 @@ def readascii(path,dimvals):
     try:
         df = pd.read_csv(path, sep=' ')
     except:
-        raise errlib.FileError("Error reading file at "+path+"\n")
+        raise FileError("Error reading file at "+path+"\n")
 
     filenm = os.path.split(path)[1]
 
@@ -488,7 +297,7 @@ def multiprocess_rcp (indata):
 
     end=time.time()
 
-    print ('time to combine ascii to a single nc:',int(end-start))
+    print ('time to combine ascii to a set of nc files: {}'.format(int(end-start)))
 
 def singleprocess_rcp (indata):
 
@@ -511,7 +320,7 @@ def singleprocess_rcp (indata):
 
     end=time.time()
 
-    print ('time to combine ascii to a set of nc files:',int(end-start))
+    print ('time to combine ascii to a set of nc files: {}'.format(int(end-start)))
 
 def outcube(cube, fname):
 
@@ -537,14 +346,14 @@ def catdata(catlist,outfil):
 
 def main():
 
-    [ascdir,valnames,NBR_PROCESSES,outfil]=readargs()
+    [ascdir,valnames,NBR_PROCESSES,outfil,filestr]=readargs()
 
     yrs=getyrs(ascdir)
 
     try:
         dimvals=[countries[valnames[0]],crops[valnames[1]],models[valnames[2]],rcps[valnames[3]]]
     except:
-        raise errlib.ArgumentsError("Could not assign dimensions based on the values: \n\ncountry = {},\ncrop = {},\nmodel = {},\nrcp = {}".format(*valnames))
+        raise ArgumentsError("Could not assign dimensions based on the values: \n\ncountry = {},\ncrop = {},\nmodel = {},\nrcp = {}".format(*valnames))
 
     indata=[yrs,ascdir,valnames,NBR_PROCESSES,dimvals,outfil]
 
