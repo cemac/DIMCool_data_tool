@@ -98,7 +98,7 @@ def catdata(catlist,outfil,dim):
 
 def combinedata(outpath,country):
 
-    print ("Collecting and merging data for {}".format(country))
+    print ("Collecting and merging data for {}".format(country), flush=True)
 
     rootloc = outpath
     dataloc = os.path.join(rootloc,'ind_rcp')
@@ -123,13 +123,19 @@ def combinedata(outpath,country):
             catlst1.sort()
             catdata(catlst1,os.path.join(modelloc,"{}_{}.nc".format(crop,model)),"rcp")
 
+        print ("Completed consolidation over rcps for all models for crop {}".format(crop), flush=True)
+
         catlst2=glob(os.path.join(modelloc,"{}_*.nc".format(crop)))
         catlst2.sort()
         catdata(catlst2,os.path.join(croploc,"{}.nc".format(crop)),"model")
 
+        print ("Completed consolidation over all models for crop {}".format(crop), flush=True)
+
     catlst3=glob(os.path.join(croploc,"*.nc"))
     catlst3.sort()
     catdata(catlst3,os.path.join(rootloc,country+".nc"),"crop")
+
+    print ("Completed consolidation over all crops for {}".format(country), flush=True)
 
     nco.ncks(input=os.path.join(rootloc,country+".nc"), output="{}_recdim.nc".format(os.path.join(rootloc,country+".nc")), options=['-O','-h', '--mk_rec_dmn time'])
 
