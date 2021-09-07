@@ -122,11 +122,11 @@ def combinedata(outpath,country):
         for model in in_models:
             catlst1=glob(os.path.join(dataloc,"{}_{}_*.nc".format(crop,model)))
             catlst1.sort()
-            catdata(catlist1,os.path.join(modelloc,"{}_{}.nc".format(crop,model)),"rcp")
+            catdata(catlst1,os.path.join(modelloc,"{}_{}.nc".format(crop,model)),"rcp")
 
         catlst2=glob(os.path.join(modelloc,"{}_*.nc".format(crop)))
         catlst2.sort()
-        catdata(catlist2,os.path.join(croploc,"{}_{}.nc".format(crop)),"model")
+        catdata(catlst2,os.path.join(croploc,"{}_{}.nc".format(crop)),"model")
 
     catlst3=glob(os.path.join(croploc,"*.nc"))
     catlst3.sort()
