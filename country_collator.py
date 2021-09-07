@@ -66,9 +66,9 @@ def readargs():
     if not dirverify(os.path.join(datadir,'ind_rcp'),"output"):
         raise ArgumentsError("Could not verify input directory")
 
-    country = outpath.split('/')[-1]
+    country = datadir.split('/')[-1]
 
-    retdata=[outpath,country]
+    retdata=[datadir,country]
 
     return retdata
 
