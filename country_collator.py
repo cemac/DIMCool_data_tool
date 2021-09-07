@@ -72,6 +72,21 @@ def readargs():
 
     return retdata
 
+
+def fieldlists(rootdir,country):
+
+    datadir = os.path.join(rootdir,country,'ind_rcp')
+
+    contents=[i for i in os.listdir(datadir) if not os.path.isdir(os.path.join(datadir,i))]
+
+    fields=[i.split('_') for i in contents]
+
+    in_crops=list(set([e[0] for e in fields]))
+    in_models=list(set([e[1] for e in fields]))
+    in_rcps=list(set([e[2].split('.')[0] for e in fields]))
+
+    return (in_crops,in_models,in_rcps)
+
 def catdata(catlist,outfil,dim):
 
     nco.ncks(input=catlist[0], output="{}_recdim.nc".format(catlist[0][:-3]), options=['-O','-h', '--mk_rec_dmn '+dim])
@@ -103,8 +118,10 @@ def combinedata(outpath,country):
     except FileExistsError:
         pass
 
-    for crop in crops.keys():
-        for model in models.keys():
+    (in_crops,in_models,in_rcps) = fieldlists(outpath,country)
+
+    for crop in in_crops:
+        for model in in_models:
             catlst1=glob(os.path.join(dataloc,"{}_{}_*.nc".format(crop,model)))
             catlst1.sort()
             catdata(catlist1,os.path.join(modelloc,"{}_{}.nc".format(crop,model)),"rcp")
