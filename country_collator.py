@@ -90,16 +90,15 @@ def catdata(catlist,outfil,dim):
     nco.ncks(input=catlist[0], output="{}_recdim.nc".format(catlist[0][:-3]), options=['-O','-h', '--mk_rec_dmn '+dim])
 
     catlist.insert(1,"{}_recdim.nc".format(catlist[0][:-3]))
-    newfile=outfil+'.nc'
-    (path, file) = os.path.split(newfile)
+    (path, file) = os.path.split(outfil)
     if not os.path.exists(path):
         os.makedirs(path)
-    nco.ncrcat(input=catlist[1:], output=newfile)
+    nco.ncrcat(input=catlist[1:], output=outfil)
 
 
 def combinedata(outpath,country):
 
-    print ("Collecting and merging data for {}".format(country))
+    print ("Collecting and merging data for {}".format(country), flush=True)
 
     rootloc = outpath
     dataloc = os.path.join(rootloc,'ind_rcp')
@@ -124,13 +123,19 @@ def combinedata(outpath,country):
             catlst1.sort()
             catdata(catlst1,os.path.join(modelloc,"{}_{}.nc".format(crop,model)),"rcp")
 
+        print ("Completed consolidation over rcps for all models for crop {}".format(crop), flush=True)
+
         catlst2=glob(os.path.join(modelloc,"{}_*.nc".format(crop)))
         catlst2.sort()
         catdata(catlst2,os.path.join(croploc,"{}.nc".format(crop)),"model")
 
+        print ("Completed consolidation over all models for crop {}".format(crop), flush=True)
+
     catlst3=glob(os.path.join(croploc,"*.nc"))
     catlst3.sort()
     catdata(catlst3,os.path.join(rootloc,country+".nc"),"crop")
+
+    print ("Completed consolidation over all crops for {}".format(country), flush=True)
 
     nco.ncks(input=os.path.join(rootloc,country+".nc"), output="{}_recdim.nc".format(os.path.join(rootloc,country+".nc")), options=['-O','-h', '--mk_rec_dmn time'])
 
