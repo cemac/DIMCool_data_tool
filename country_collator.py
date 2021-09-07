@@ -73,9 +73,7 @@ def readargs():
     return retdata
 
 
-def fieldlists(rootdir,country):
-
-    datadir = os.path.join(rootdir,country,'ind_rcp')
+def fieldlists(datadir,country):
 
     contents=[i for i in os.listdir(datadir) if not os.path.isdir(os.path.join(datadir,i))]
 
@@ -103,7 +101,7 @@ def combinedata(outpath,country):
 
     print ("Collecting and merging data for {}".format(country))
 
-    rootloc = os.path.join(outpath,country)
+    rootloc = outpath
     dataloc = os.path.join(rootloc,'ind_rcp')
     modelloc = os.path.join(rootloc,'ind_mod')
     croploc = os.path.join(rootloc,'ind_crop')
@@ -118,7 +116,7 @@ def combinedata(outpath,country):
     except FileExistsError:
         pass
 
-    (in_crops,in_models,in_rcps) = fieldlists(outpath,country)
+    (in_crops,in_models,in_rcps) = fieldlists(dataloc,country)
 
     for crop in in_crops:
         for model in in_models:
