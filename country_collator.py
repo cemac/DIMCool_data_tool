@@ -126,7 +126,7 @@ def combinedata(outpath,country):
 
         catlst2=glob(os.path.join(modelloc,"{}_*.nc".format(crop)))
         catlst2.sort()
-        catdata(catlst2,os.path.join(croploc,"{}_{}.nc".format(crop)),"model")
+        catdata(catlst2,os.path.join(croploc,"{}.nc".format(crop)),"model")
 
     catlst3=glob(os.path.join(croploc,"*.nc"))
     catlst3.sort()
