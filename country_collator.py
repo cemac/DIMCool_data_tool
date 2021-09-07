@@ -90,11 +90,10 @@ def catdata(catlist,outfil,dim):
     nco.ncks(input=catlist[0], output="{}_recdim.nc".format(catlist[0][:-3]), options=['-O','-h', '--mk_rec_dmn '+dim])
 
     catlist.insert(1,"{}_recdim.nc".format(catlist[0][:-3]))
-    newfile=outfil+'.nc'
-    (path, file) = os.path.split(newfile)
+    (path, file) = os.path.split(outfil)
     if not os.path.exists(path):
         os.makedirs(path)
-    nco.ncrcat(input=catlist[1:], output=newfile)
+    nco.ncrcat(input=catlist[1:], output=outfil)
 
 
 def combinedata(outpath,country):
