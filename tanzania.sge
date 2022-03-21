@@ -1,0 +1,12 @@
+#!/bin/bash
+#$ -cwd -V
+#$ -l h_rt=36:00:00
+#$ -o /nobackup/chmcsy/job_out_consolidate/tanzania/consolidate_tanzania.o
+#$ -e /nobackup/chmcsy/job_out_consolidate/tanzania/consolidate_tanzania.e
+
+. /nobackup/chmcsy/miniconda/etc/profile.d/conda.sh
+conda activate DIMdata
+
+cd ~/DIMCool_data_tool
+
+python3 country_collator.py -d /nobackup/chmcsy/out/nc_outs/tanzania
