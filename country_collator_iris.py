@@ -31,10 +31,11 @@ Created June 2021
 """
 
 import os
+import iris
+from glob import glob
+
 from errlib import dirverify, ArgumentsError
 from argparse import ArgumentParser
-from glob import glob
-import iris
 
 def readargs():
     '''
@@ -71,7 +72,7 @@ def readargs():
     return retdata
 
 
-def fieldlists(datadir,country):
+def fieldlists(datadir):
 
     contents=[i for i in os.listdir(datadir) if not os.path.isdir(os.path.join(datadir,i))]
 
@@ -80,16 +81,20 @@ def fieldlists(datadir,country):
     in_crops=list(set([e[0] for e in fields]))
     in_models=list(set([e[1] for e in fields]))
     in_rcps=list(set([e[2].split('.')[0] for e in fields]))
+    
+    in_crops.sort()
+    in_models.sort()
+    in_rcps.sort()
 
     return (in_crops,in_models,in_rcps)
 
-def catdata(catlist,outfil,dim):
+def catdata(catlist,outfil):
 
     cubes=iris.load(catlist)
     
     iris.util.equalise_attributes(cubes)
 
-    cubes.concatenate()
+    cubes = cubes.concatenate()
 
     (path, file) = os.path.split(outfil)
     if not os.path.exists(path):
@@ -118,29 +123,29 @@ def combinedata(outpath,country):
     except FileExistsError:
         pass
 
-    (in_crops,in_models,in_rcps) = fieldlists(dataloc,country)
+    (in_crops,in_models,in_rcps) = fieldlists(dataloc)
 
     for crop in in_crops:
         for model in in_models:
             catlst1=glob(os.path.join(dataloc,"{}_{}_*.nc".format(crop,model)))
             catlst1.sort()
-            catdata(catlst1,os.path.join(modelloc,"{}_{}.nc".format(crop,model)),"rcp")
+            catdata(catlst1,os.path.join(modelloc,"{}_{}.nc".format(crop,model)))
+            
+            print ("Combined rcps for crop {} and model {}".format(crop,model), flush=True)
 
         print ("Completed consolidation over rcps for all models for crop {}".format(crop), flush=True)
 
         catlst2=glob(os.path.join(modelloc,"{}_*.nc".format(crop)))
         catlst2.sort()
-        catdata(catlst2,os.path.join(croploc,"{}.nc".format(crop)),"model")
+        catdata(catlst2,os.path.join(croploc,"{}.nc".format(crop)))
 
         print ("Completed consolidation over all models for crop {}".format(crop), flush=True)
 
     catlst3=glob(os.path.join(croploc,"*.nc"))
     catlst3.sort()
-    catdata(catlst3,os.path.join(rootloc,country+".nc"),"crop")
+    catdata(catlst3,os.path.join(rootloc,country+".nc"))
 
     print ("Completed consolidation over all crops for {}".format(country), flush=True)
-
-    #nco.ncks(input=os.path.join(rootloc,country+".nc"), output="{}_recdim.nc".format(os.path.join(rootloc,country+".nc")), options=['-O','-h', '--mk_rec_dmn time'])
 
 
 def main():
