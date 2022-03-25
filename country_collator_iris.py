@@ -91,7 +91,7 @@ def fieldlists(dataloc):
 def catdata(catlist,outfil,durflg=0):
 
     if durflg == 1:
-        cubes=iris.load(catlist, ['plant_date','yield','biomass','t_rad_abs'])
+        cubes=iris.load(catlist, ['plant_date','yield','biomass','t_rad_abs', 'rlai_2', 'evtrans1'])
     else:
         cubes=iris.load(catlist)
     
