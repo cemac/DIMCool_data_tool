@@ -72,9 +72,9 @@ def readargs():
     return retdata
 
 
-def fieldlists(datadir):
+def fieldlists(dataloc):
 
-    contents=[i for i in os.listdir(datadir) if not os.path.isdir(os.path.join(datadir,i))]
+    contents=[i for i in os.listdir(dataloc) if not os.path.isdir(os.path.join(dataloc,i))]
 
     fields=[i.split('_') for i in contents]
 
@@ -88,13 +88,24 @@ def fieldlists(datadir):
 
     return (in_crops,in_models,in_rcps)
 
-def catdata(catlist,outfil):
+def catdata(catlist,outfil,durflg=0):
 
-    cubes=iris.load(catlist)
+    if durflg == 1:
+        cubes=iris.load(catlist, ['plant_date','yield','biomass','t_rad_abs'])
+    else:
+        cubes=iris.load(catlist)
     
     iris.util.equalise_attributes(cubes)
 
     cubes = cubes.concatenate()
+    
+    if durflg == 1:
+        durcube = iris.load_cube(catlist[0],'dur')
+        tochange = [cube for cube in cubes if cube.var_name == 't_rad_abs'][0]
+        tochange.rename(durcube.name())
+        tochange.units=durcube.units
+        tochange.long_name=durcube.long_name
+        tochange.var_name=durcube.var_name       
 
     (path, file) = os.path.split(outfil)
     if not os.path.exists(path):
@@ -129,7 +140,7 @@ def combinedata(outpath,country):
         for model in in_models:
             catlst1=glob(os.path.join(dataloc,"{}_{}_*.nc".format(crop,model)))
             catlst1.sort()
-            catdata(catlst1,os.path.join(modelloc,"{}_{}.nc".format(crop,model)))
+            catdata(catlst1,os.path.join(modelloc,"{}_{}.nc".format(crop,model)), durflg=1)
             
             print ("Combined rcps for crop {} and model {}".format(crop,model), flush=True)
 
