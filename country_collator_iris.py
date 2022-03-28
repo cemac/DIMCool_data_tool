@@ -113,7 +113,8 @@ def catdata(catlist,outfil,durflg=0):
 
     iris.fileformats.netcdf.save(cubes2, outfil)
 
-    cubes, cubes2 = None
+    cubes = None
+    cubes2 = None
 
 def combinedata(outpath,country):
 
