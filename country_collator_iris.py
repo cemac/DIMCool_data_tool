@@ -81,7 +81,7 @@ def fieldlists(dataloc):
     in_crops=list(set([e[0] for e in fields]))
     in_models=list(set([e[1] for e in fields]))
     in_rcps=list(set([e[2].split('.')[0] for e in fields]))
-    
+
     in_crops.sort()
     in_models.sort()
     in_rcps.sort()
@@ -94,26 +94,26 @@ def catdata(catlist,outfil,durflg=0):
         cubes=iris.load(catlist, ['plant_date','yield','biomass','t_rad_abs', 'rlai_2', 'evtrans1'])
     else:
         cubes=iris.load(catlist)
-    
+
     iris.util.equalise_attributes(cubes)
 
-    cubes = cubes.concatenate()
-    
+    cubes2 = cubes.concatenate()
+
     if durflg == 1:
         durcube = iris.load_cube(catlist[0],'dur')
-        tochange = [cube for cube in cubes if cube.var_name == 't_rad_abs'][0]
+        tochange = [cube for cube in cubes2 if cube.var_name == 't_rad_abs'][0]
         tochange.rename(durcube.name())
         tochange.units=durcube.units
         tochange.long_name=durcube.long_name
-        tochange.var_name=durcube.var_name       
+        tochange.var_name=durcube.var_name
 
     (path, file) = os.path.split(outfil)
     if not os.path.exists(path):
         os.makedirs(path)
-        
-    iris.fileformats.netcdf.save(cubes, outfil, zlib=True)
 
-    cubes = None
+    iris.fileformats.netcdf.save(cubes2, outfil)
+
+    cubes, cubes2 = None
 
 def combinedata(outpath,country):
 
@@ -137,27 +137,16 @@ def combinedata(outpath,country):
     (in_crops,in_models,in_rcps) = fieldlists(dataloc)
 
     for crop in in_crops:
-        for model in in_models:
-            catlst1=glob(os.path.join(dataloc,"{}_{}_*.nc".format(crop,model)))
-            catlst1.sort()
-            catdata(catlst1,os.path.join(modelloc,"{}_{}.nc".format(crop,model)), durflg=1)
-            
-            print ("Combined rcps for crop {} and model {}".format(crop,model), flush=True)
+        for rcp in in_rcps:
+            catlist=glob(os.path.join(dataloc,"{}_*_{}.nc".format(crop,rcp)))
+            catlist.sort()
+            catdata(catlist,os.path.join(modelloc,"{}_{}_{}.nc".format(country,crop,rcp)), durflg=1)
 
-        print ("Completed consolidation over rcps for all models for crop {}".format(crop), flush=True)
+            print ("Combined models for crop {} and rcp {}".format(crop,rcp), flush=True)
 
-        catlst2=glob(os.path.join(modelloc,"{}_*.nc".format(crop)))
-        catlst2.sort()
-        catdata(catlst2,os.path.join(croploc,"{}.nc".format(crop)))
+        print ("Completed consolidation over models for all rcps for crop {}".format(crop), flush=True)
 
-        print ("Completed consolidation over all models for crop {}".format(crop), flush=True)
-
-    catlst3=glob(os.path.join(croploc,"*.nc"))
-    catlst3.sort()
-    catdata(catlst3,os.path.join(rootloc,country+".nc"))
-
-    print ("Completed consolidation over all crops for {}".format(country), flush=True)
-
+    print("Completed consolidation for all crops in country {}".format(country), flush=True)
 
 def main():
 

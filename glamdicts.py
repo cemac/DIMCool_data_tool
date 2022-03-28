@@ -15,10 +15,10 @@ countries={
         "zambia":3
         }
 crops={
-      "maize":0,
-      "potato":1,
-      "soybean":2,
-      "groundnut":3,
+      "maize":2,
+      "potato":0,
+      "soybean":3,
+      "groundnut":1,
       "cassava":4,
       "rice":5,
       "sorghum":6,
