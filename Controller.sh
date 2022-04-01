@@ -33,13 +33,13 @@ REGIONS="malawi zambia tanzania safrica"
 MODELS="bcc-csm1-1 BNU-ESM CSIRO-Mk3-6-0 GFDL-ESM2G IPSL-CM5A-LR MIROC-ESM MPI-ESM-LR MRI-CGCM3 NorESM1-M bcc-csm1-1-m CanESM2 CNRM-CM5 GFDL-CM3 GFDL-ESM2M IPSL-CM5A-MR MIROC5 MIROC-ESM-CHEM MPI-ESM-MR"
 RCPS="rcp26 rcp85"
 
-#CROPS="groundnut"
+#CROPS="potato"
 #REGIONS="malawi"
-#MODELS="bcc-csm1-1"
+#MODELS="IPSL-CM5A-MR"
 #RCPS="rcp26"
 
 # prefix for job script:
-JOB_PREFIX='consolidate'
+JOB_PREFIX='reconsolidate'
 
 # start looping:
 for c in ${CROPS}
@@ -65,7 +65,7 @@ do
         cat > ${JOB_SCRIPT} <<-EOF
 #!/bin/bash
 #$ -cwd -V
-#$ -l h_rt=12:00:00
+#$ -l h_rt=02:00:00
 #$ -o ${SGE_STDOUT_PATH}
 #$ -e ${SGE_STDERR_PATH}
 #$ -pe smp ${N_PROC}
@@ -75,7 +75,7 @@ conda activate DIMCool1
 
 cd ${PYLOC}
 
-python3 year_collator.py -d ${RCP_DATA_DIR} -o ${NC_DIR} -p ${N_PROC}
+python3 year_collator.py -d ${RCP_DATA_DIR} -o ${NC_DIR} -p ${N_PROC} -s amma
 EOF
         chmod 755 ${JOB_SCRIPT}
 
