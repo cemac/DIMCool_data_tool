@@ -259,7 +259,7 @@ def fullyr(data):
     for prod in prod_lst:
         for irr in irr_lst:
             n+=1
-            filenm=valnames[1]+"_"+valnames[0]+filestr+valnames[2]+"_"
+            filenm=valnames[1]+"_"+valnames[0]+"_"+filestr+"_"+valnames[2]+"_"
             filenm=filenm+valnames[3]+"_Fut_"+yr+"_"+prod+"_"+irr+"_1.out"
             path=ascdir+yr+"/"+filenm
 
