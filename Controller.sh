@@ -71,7 +71,7 @@ do
 #$ -pe smp ${N_PROC}
 
 . ${CONDA_LOC}/etc/profile.d/conda.sh
-conda activate DIMdata
+conda activate DIMCool1
 
 cd ${PYLOC}
 
