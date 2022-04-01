@@ -224,7 +224,7 @@ def readascii(path,dimvals):
     cubelist=iris.cube.CubeList([])
     for col in df:
         num=int(col[1:])
-        if num > 3:
+        if (num == 8 or num == 9 or num == 36 or num == 4):
             cube_layer=cube_templ.copy()
             for index, row in df.iterrows():
                 lat=row['V2']
@@ -249,6 +249,7 @@ def fullyr(data):
     ascdir = data[1][1]
     dimvals = data[1][2]
     outfil=data[1][3]
+    filestr=data[1][4]
     yr=data[0]
 
     cubelst=iris.cube.CubeList([])
@@ -258,7 +259,7 @@ def fullyr(data):
     for prod in prod_lst:
         for irr in irr_lst:
             n+=1
-            filenm=valnames[1]+"_"+valnames[0]+"_amma_df_"+valnames[2]+"_"
+            filenm=valnames[1]+"_"+valnames[0]+filestr+valnames[2]+"_"
             filenm=filenm+valnames[3]+"_Fut_"+yr+"_"+prod+"_"+irr+"_1.out"
             path=ascdir+yr+"/"+filenm
 
@@ -272,13 +273,13 @@ def fullyr(data):
 
 def multiprocess_rcp (indata):
 
-    [yrs,ascdir,valnames,procs,dimvals,outfil]=indata
+    [yrs,ascdir,valnames,procs,dimvals,outfil,filestr]=indata
 
     yearlist=[]
 
     locproc=min(len(yrs),procs)
 
-    args=[valnames,ascdir,dimvals,outfil]
+    args=[valnames,ascdir,dimvals,outfil,filestr]
 
     itterable = [[yr, args] for yr in yrs]
 
@@ -301,11 +302,11 @@ def multiprocess_rcp (indata):
 
 def singleprocess_rcp (indata):
 
-    [yrs,ascdir,valnames,procs,dimvals,outfil]=indata
+    [yrs,ascdir,valnames,procs,dimvals,outfil,filestr]=indata
 
     start=time.time()
 
-    args=[valnames,ascdir,dimvals,outfil]
+    args=[valnames,ascdir,dimvals,outfil,filestr]
 
     itterable = [[yr, args] for yr in yrs]
 
@@ -329,7 +330,7 @@ def outcube(cube, fname):
     else:
         outfile=fname
 
-    iris.fileformats.netcdf.save(cube, outfile, zlib=True)
+    iris.fileformats.netcdf.save(cube, outfile)
 
 def catdata(catlist,outfil):
 
@@ -355,7 +356,7 @@ def main():
     except:
         raise ArgumentsError("Could not assign dimensions based on the values: \n\ncountry = {},\ncrop = {},\nmodel = {},\nrcp = {}".format(*valnames))
 
-    indata=[yrs,ascdir,valnames,NBR_PROCESSES,dimvals,outfil]
+    indata=[yrs,ascdir,valnames,NBR_PROCESSES,dimvals,outfil,filestr]
 
     if NBR_PROCESSES>1:
 

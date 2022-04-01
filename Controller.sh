@@ -4,7 +4,7 @@
 DATA_DIR='/nobackup/earsj/out/africap/DIMlookup/rawouts'
 
 # directory from which jobs will be run:
-NC_DIR='/nobackup/chmcsy/out/nc_outs'
+NC_DIR='/nobackup/chmcsy/out/nc_outs_2'
 
 # directory job std out / std err:
 JOB_OUT='/nobackup/chmcsy/job_out_consolidate'
@@ -27,7 +27,7 @@ mkdir -p $JOB_DONE
 mkdir -p $JOB_OUT
 mkdir -p $NC_DIR
 
-# going to loop over these in turn, and submit a job for each cobination:
+# going to loop over these in turn, and submit a job for each combination:
 CROPS="maize soybean potato groundnut"
 REGIONS="malawi zambia tanzania safrica"
 MODELS="bcc-csm1-1 BNU-ESM CSIRO-Mk3-6-0 GFDL-ESM2G IPSL-CM5A-LR MIROC-ESM MPI-ESM-LR MRI-CGCM3 NorESM1-M bcc-csm1-1-m CanESM2 CNRM-CM5 GFDL-CM3 GFDL-ESM2M IPSL-CM5A-MR MIROC5 MIROC-ESM-CHEM MPI-ESM-MR"

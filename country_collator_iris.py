@@ -91,21 +91,13 @@ def fieldlists(dataloc):
 def catdata(catlist,outfil,durflg=0):
 
     if durflg == 1:
-        cubes=iris.load(catlist, ['plant_date','yield','biomass','t_rad_abs', 'rlai_2', 'evtrans1'])
+        cubes=iris.load(catlist, ['plant_date','yield','biomass','dur'])
     else:
         cubes=iris.load(catlist)
 
     iris.util.equalise_attributes(cubes)
 
     cubes2 = cubes.concatenate()
-
-    if durflg == 1:
-        durcube = iris.load_cube(catlist[0],'dur')
-        tochange = [cube for cube in cubes2 if cube.var_name == 't_rad_abs'][0]
-        tochange.rename(durcube.name())
-        tochange.units=durcube.units
-        tochange.long_name=durcube.long_name
-        tochange.var_name=durcube.var_name
 
     (path, file) = os.path.split(outfil)
     if not os.path.exists(path):

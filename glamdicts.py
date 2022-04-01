@@ -102,7 +102,7 @@ column={'V1': 'Year',
         'V45': 'STORED_WATER',
         'V46': 'Panicle initiation date (DOY - Sorghum only)',
         'V47': 'Flowering date (DOY - Sorghum only)',
-        'V48': 'Total supplementary irrigation added to VOLSW (1) if using SUP irrigation'
+        'V48': 'Total supplementary irrigation added to VOLSW (1) if using SUP irrigation',
         'V49': 'Maximum value of Leaf Area Index',
         }
 var_nm={'V1' : 'year',
@@ -152,7 +152,7 @@ var_nm={'V1' : 'year',
         'V45': 'stor_wat',
         'V46': 'pan_init_date',
         'V47': 'flowr_date',
-        'V48': 'tot_irr_sup'
+        'V48': 'tot_irr_sup',
         'V49': 'lai_max',
         }
 var_units={'V1' : 'year',
@@ -202,6 +202,6 @@ var_units={'V1' : 'year',
            'V45': 'cm',
            'V46': 'day',
            'V47': 'day',
-           'V48': 'cm'
+           'V48': 'cm',
            'V49': 'm^2/m^2',
            }
